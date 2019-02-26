@@ -16,3 +16,11 @@ It`s a sample application which how to achieve SSO for your microservices with u
   * [sso-spring-security-oauth2](https://www.baeldung.com/)
   * [jwt tokens example](https://github.com/monkey-codes/spring-boot-authentication)
   * [microservices-security-with-oauth2](https://piotrminkowski.wordpress.com/2017/02/22/microservices-security-with-oauth2/)     
+
+  
+ ##### issue:
+ 
+ `import sun.security.rsa.RSAPublicKeyImpl;` error Access restriction: The type QName is not accessible due to restriction on required library C:\Program Files\Java\jdk1.8.0_181\jre\lib\rt.jar
+ 
+ https://stackoverflow.com/questions/860187/access-restriction-on-class-due-to-restriction-on-required-library-rt-jar
+ 

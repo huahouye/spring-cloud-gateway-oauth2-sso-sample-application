@@ -1,5 +1,10 @@
 package org.c4isr.delta.cloudgateway.jwt;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URI;
+import java.security.InvalidKeyException;
+import java.security.interfaces.RSAPublicKey;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 import org.slf4j.Logger;
@@ -14,12 +19,6 @@ import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.web.reactive.function.client.WebClient;
 import sun.security.rsa.RSAPublicKeyImpl;
-
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.URI;
-import java.security.InvalidKeyException;
-import java.security.interfaces.RSAPublicKey;
 
 @Configuration
 public class JwtConfiguration {
