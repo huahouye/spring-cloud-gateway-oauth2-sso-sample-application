@@ -23,41 +23,34 @@ import sun.security.rsa.RSAPublicKeyImpl;
 @Configuration
 public class JwtConfiguration {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JwtConfiguration.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(JwtConfiguration.class);
 
+  @Value("${spring.security.oauth2.client.provider.delta.jwt-key-uri}")
+  private String keyUri;
 
-    @Value("${spring.security.oauth2.client.provider.delta.jwt-key-uri}")
-    private String keyUri;
+  @Bean
+  ReactiveOAuth2UserService<OAuth2UserRequest, OAuth2User> userService(
+      ReactiveJwtDecoder jwtDecoder) {
+    return new JwtReactiveOAuth2UserService(jwtDecoder);
+  }
 
+  @Bean
+  ReactiveJwtDecoder jwtDecoder() throws IOException, InvalidKeyException {
+    return WebClient.create().get().uri(URI.create(keyUri)).exchange()
+        .flatMap(clientResponse -> clientResponse.bodyToMono(JwtPublicKey.class))
+        .map(jwtPublicKey -> parsePublicKey(jwtPublicKey.getValue()))
+        .map(NimbusReactiveJwtDecoder::new).block();
+  }
 
-    @Bean
-    ReactiveOAuth2UserService<OAuth2UserRequest, OAuth2User> userService(ReactiveJwtDecoder jwtDecoder){
-        return new JwtReactiveOAuth2UserService(jwtDecoder);
+  private RSAPublicKey parsePublicKey(String keyValue) {
+    PemReader pemReader = new PemReader(new StringReader(keyValue));
+    PemObject pem = null;
+    try {
+      pem = pemReader.readPemObject();
+      return new RSAPublicKeyImpl(pem.getContent());
+    } catch (IOException | InvalidKeyException e) {
+      LOGGER.error("Unable to parse public key", e);
     }
-
-    @Bean
-    ReactiveJwtDecoder jwtDecoder() throws IOException, InvalidKeyException {
-        return WebClient.create().get().uri(URI.create(keyUri))
-                .exchange()
-                .flatMap(clientResponse -> clientResponse.bodyToMono(JwtPublicKey.class))
-                .map(jwtPublicKey -> parsePublicKey(jwtPublicKey.getValue()))
-                .map(NimbusReactiveJwtDecoder::new).block();
-    }
-
-
-
-    private RSAPublicKey parsePublicKey(String keyValue) {
-        PemReader pemReader = new PemReader(new StringReader(keyValue));
-        PemObject pem = null;
-        try {
-            pem = pemReader.readPemObject();
-            return new RSAPublicKeyImpl(pem.getContent());
-        } catch (IOException | InvalidKeyException e) {
-            LOGGER.error("Unable to parse public key",e);
-        }
-        return null;
-    }
-
-
-
+    return null;
+  }
 }

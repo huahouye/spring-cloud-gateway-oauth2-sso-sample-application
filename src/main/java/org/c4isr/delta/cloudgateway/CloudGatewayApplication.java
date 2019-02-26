@@ -10,28 +10,19 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @SpringBootApplication
 public class CloudGatewayApplication {
 
+  @Bean
+  SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
+    // @formatter:off
+    http.authorizeExchange()
+      .anyExchange().authenticated().and()
+      .oauth2Login().and()
+      .oauth2ResourceServer().jwt()
+      .jwtAuthenticationConverter(new JwtOAuth2AuthenticationTokenConverter());
+    // @formatter:on
+    return http.build();
+  }
 
-    @Bean
-    SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-        http
-                .authorizeExchange()
-                  .anyExchange()
-                    .authenticated()
-                .and()
-                  .oauth2Login()
-                .and()
-                  .oauth2ResourceServer()
-                    .jwt().jwtAuthenticationConverter(new JwtOAuth2AuthenticationTokenConverter());
-        return http.build();
-    }
-
-
-
-
-    public static void main(String[] args) {
-        SpringApplication.run(CloudGatewayApplication.class, args);
-
-    }
-
-
+  public static void main(String[] args) {
+    SpringApplication.run(CloudGatewayApplication.class, args);
+  }
 }
